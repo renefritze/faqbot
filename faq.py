@@ -46,7 +46,7 @@ class Main:
 	
 	def saveFaqs( self ):
 		faqfile = open(self.filename,'w')
-		for key,msg in self.faqs:
+		for key,msg in self.faqs.items():
 			faqfile.write( key + "|" + msg + "|" )
 		faqfile.flush()
 		faqfile.close()
