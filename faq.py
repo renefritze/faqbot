@@ -44,17 +44,21 @@ class Main:
 			i += 2
 		faqfile.close()
 	
+	def saveFaqs( self ):
+		faqfile = open(self.filename,'w')
+		for key,msg in self.faqs:
+			faqfile.write( key + "|" + msg + "|" )
+		faqfile.flush()
+		faqfile.close()
+
 	def addFaq( self, key, args ):
-		faqfile = open(self.filename,'a')
 		msg = " "
 		for arg in args :
 			msg +=  arg + " "
 		if msg != "" :
 			msg = msg.replace( "\\n", '\n' )
 			self.faqs[key] = msg
-			faqfile.write( key + "|" + msg + "|" )
-			faqfile.flush()
-			faqfile.close()
+		self.saveFaqs()
 		
 	def onload(self,tasc):
 	  self.app = tasc.main
