@@ -46,9 +46,9 @@ class Main:
 	
 	def addFaq( self, key, args ):
 		faqfile = open(self.filename,'a')
-		msg = ""
+		msg = " "
 		for arg in args :
-			msg +=  arg
+			msg +=  arg + " "
 		if msg != "" :
 			msg = msg.replace( "\\n", '\n' )
 			self.faqs[key] = msg
