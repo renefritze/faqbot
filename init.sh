@@ -14,3 +14,4 @@ done
 
 cp Main.conf.example Main.conf
 
+touch faqs.txt
