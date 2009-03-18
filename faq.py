@@ -64,6 +64,9 @@ class Main:
 			self.faqs[key] = msg
 		self.saveFaqs()
 		
+	def ondestroy( self ):
+	    self.saveFaqs()
+	
 	def onload(self,tasc):
 	  self.app = tasc.main
 	  self.chans = parselist(self.app.config["channels"],',')
