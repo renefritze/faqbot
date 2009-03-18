@@ -22,7 +22,6 @@ class Main:
 				user = args[1]
 				diff = now - self.last_time 
 				if diff > self.min_pause :
-					chan = self.chans[0]
 					chan = args[0]
 				#if self.chans.find(args[0]) > 0:
 					msg = self.faqs[args[3]]
@@ -33,6 +32,11 @@ class Main:
 				self.last_time = time()
 			if args[2] == "!faqlearn" and args[1] in self.admins and len(args) > 4:
 				self.addFaq( args[3], args[4:] )
+			if args[2] == "!faqlist":
+				faqstring = "available faq items are: "
+				for key in self.faqs:
+				    faqstring += key + " "
+				socket.send("SAY %s %s\n" % (args[0],faqstring ))
 	
 	def loadFaqs( self ):
 		faqfile = open(self.filename,'r')
