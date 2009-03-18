@@ -14,9 +14,9 @@ class Main:
 		for chan in args[3:]:
 		    if args[2] == "!faqchan":
 			socket.send("JOIN %s\n" % (chan))
-		    else if args[2] == "!faq!chan":
+		    if args[2] == "!faq!chan":
 			socket.send("LEAVE %s\n" % (chan))
-		    
+
 	def onload(self,tasc):
 	    self.app = tasc.main
 	    self.admins = parselist(self.app.config["admins"],',')
