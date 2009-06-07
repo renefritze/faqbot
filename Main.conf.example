@@ -7,3 +7,4 @@ plugins=help,faq,join_channels;
 channels=springlobby;
 password=;
 faqfile=faqs.txt
+faqlinksfile=faqlinks.txt
