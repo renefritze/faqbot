@@ -17,7 +17,7 @@ class Main:
 		return "der"
 
 	def oncommandfromserver(self,command,args,socket):
-		if command == "SAID" and len(args) > 2:
+		if command.startswith("SAID") and len(args) > 2:
 			if args[2] == "!faq" and len(args) > 3:
 				now = time()
 				user = args[1]
