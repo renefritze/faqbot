@@ -1,1 +1,1 @@
-sadfnaskfjnadsfkajdsn|huhu|
+gl_arb|GL_ARB|How do I play|startplay|taspring|spring_name|PreGame couldn't find any mod files|mod|can someone help me|getting_help|GL_ARB|gl_arb|.ingame|ingame|!ingame|ingame|v0.0.1.0678|opensuse|how do I play|startplay|How do i play|startplay|GLEW_ARB|gl_arb|how do i play|startplay|gamedata/parse_tdf.lua|broken_datadir|broken_datadir|gamedata/parse_tdf.lua|

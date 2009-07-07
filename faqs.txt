@@ -1,5 +1,19 @@
-huhu|hfiwhfwihf|ko|hfiwhfwihf
-mvkdmknm|kwo|"hfiwhfwihf|zuo|hdwheu|fz|hfiwhfwihf
-hdwheu|hfiwhfwihf|
-hdwheu|1|hfiwhfwihf
-hdwheu|
+ingame|It's "/ingame".|sl_install|http://springlobby.info/wiki/springlobby/Install|addbot|KAIK will work fine for most if not all the Annihilation mods, if a LuaAI is available ( marked as mod specific AI ) it's warmly suggested to use that instead
+If the bot is too hard to beat, give yourself some resource bonus, if it's too easy, add more than one an/or give the mentioned bonus to the bots|lobby_reload|map/mod list can be reloaded in various ways: for TASClient users, click on the host battle button
+for SpringLobby users, it can be accessed from the tools->Reload map/mod list button
+both lobbies can also reload the list by the button inside an empty minimap preview|gl_arb|This error can be caused by various things: 1. Old video Hardware.   2. Old drivers.  3. Bad installed Drivers. 4. Bad game settings. 
+If your hardware is old check http://www.delphi3d.net/hardware/extsupport.php?extension=GL_ARB_texture_env_combine 
+ if you cant find your video card then, sorry, you have to buy a new video card.|spring_name|The project name is just "Spring", "TASpring" was the old name and it's deprecated, "SpringRTS" is just a keyword that is used to facilitate searches/is less common than Spring, but the real, official name remains "Spring".|opensuse|http://springlobby.info/wiki/springlobby/Install#openSuse-Suse-Linux-Fedora-and-Mandriva|ranks|Lobby rank is solely based on ingame time accumulated, use /ingame to check your current amount, available ranks are:
+newbie: <= 5h, beginner: 5h - 15h, average: 15h - 30h, above average: 30h - 100h, experienced: 100h- 300h
+highly experienced: 300h - 1000h, veteran > 1000h|datadir|Spring's datadir location changes according to the OS, windows XP: spring's installation path
+linux: ~/.spring
+vista/windows7 with UAC on: c:\Users\username\App Data\local\VirtualStore\Program Files\Spring
+vista/windows7 with UAC off: c:\Users\username\App Data\local\spring|sl_ticket|http://springlobby.info/projects/springlobby/issues/new|download|The integrated downloader will prompt you about downloading everything needed for the joined game
+in the case it fails, you can still manually download the required files from the sites linked in the #newbies topic
+files downloaded that way need to be moved to the spring datadir to be installed( use !faq datadir for more infos ) and a lobby list reload might be necessary ( use !faq lobby_reload for more infos )|broken_datadir|If you get errors such as ''could not parse : 'gamedata/parse_tdf.lua'", it means that either your spring content installation is being broken or cannot be found
+first of all search for all instances of springcontent.sdz in all spring data subfolders BUT skip the folder where spring is installed to ( use !faq datadir for a list of possible folders )
+if you're using windows vista/windows7 with the uac on and the problem persists after trying the first step, reinstalling spring to a location other than program files fixes it|startplay|You'll need both a map & a mod(game) to play, both can be downloaded directly by trying to join a game on the list
+A good way to start learning is to spectate ( join a game and select the spectator button) some battle or play a singleplayer game and add a bot
+for more informations, use !faq mod or !faq addbot or !faq download|paste|If you need to upload some text, such as an infolog.txt, some other file, or any text longer than 3 lines, use a service such as http://pastebin.com/ or http://www.pastey.net/ and post the link to the generated file here.|mod|Spring is just an engine, alone it won't do much, mods are games that run on the engine
+you can download them either from the integrated downloader or from the urls in the #newbies topic
+the most popular mirror url is http://spring.jobjol.nl|
