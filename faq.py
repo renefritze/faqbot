@@ -9,6 +9,7 @@ class Main:
 	admins = []
 	faqs = dict()
 	faqlinks = dict()
+	sortedlinks = {}
 	filename = ""
 	last_faq = ""
 	last_time = time()
@@ -40,7 +41,7 @@ class Main:
 				return
 			else:
 				msg = " ".join( args[2:] )
-				for phrase in self.faqlinks:
+				for phrase in self.sortedlinks:
 					if msg.find( phrase ) >= 0:
 						faqkey = self.faqlinks[phrase]
 						print "autodetected message: \"" + msg + "\" faq found: " + faqkey + "\n"
@@ -76,6 +77,7 @@ class Main:
 		while i < len(entries) - 1  :
 			self.faqlinks[entries[i]] = entries[i+1]
 			i += 2
+		self.sortedlinks = sorted( self.faqlinks, key=len, reverse=True )
 		faqlinksfile.close()
 
 	def saveFaqs( self ):
@@ -96,6 +98,7 @@ class Main:
 		msg = " ".join( args )
 		if msg != "" :
 			self.faqlinks[msg] = key
+			self.sortedlinks = sorted( self.faqlinks, key=len, reverse=True )
 		self.saveFaqLinks()
 
 	def addFaq( self, key, args ):
