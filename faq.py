@@ -18,7 +18,7 @@ class Main:
 		return "der"
 
 	def oncommandfromserver(self,command,args,socket):
-		if command.startswith("SAID") and len(args) > 2:
+		if command.startswith("SAID") and len(args) > 2 and args[1] != self.faqbotname:
 			if args[2] == "!faq" and len(args) > 3:
 				now = time()
 				user = args[1]
@@ -40,7 +40,7 @@ class Main:
 				self.addFaqLink( args[3], args[4:] )
 				return
 			else:
-				msg = " ".join( args[2:] )
+				msg = " ".join( args[2:] ).lower()
 				for phrase in self.sortedlinks:
 					if msg.find( phrase ) >= 0:
 						faqkey = self.faqlinks[phrase]
@@ -65,7 +65,7 @@ class Main:
 		entries = content.split('|')
 		i = 0
 		while i < len(entries) - 1  :
-			self.faqs[entries[i]] = entries[i+1]
+			self.faqs[entries[i].lower()] = entries[i+1]
 			i += 2
 		faqfile.close()
 
@@ -75,7 +75,7 @@ class Main:
 		entries = content.split('|')
 		i = 0
 		while i < len(entries) - 1  :
-			self.faqlinks[entries[i]] = entries[i+1]
+			self.faqlinks[entries[i].lower()] = entries[i+1].lower()
 			i += 2
 		self.sortedlinks = sorted( self.faqlinks, key=len, reverse=True )
 		faqlinksfile.close()
@@ -97,7 +97,7 @@ class Main:
 	def addFaqLink( self, key, args ):
 		msg = " ".join( args )
 		if msg != "" :
-			self.faqlinks[msg] = key
+			self.faqlinks[msg.lower()] = key.lower()
 			self.sortedlinks = sorted( self.faqlinks, key=len, reverse=True )
 		self.saveFaqLinks()
 
@@ -105,7 +105,7 @@ class Main:
 		msg = " ".join( args )
 		if msg != "" :
 			msg = msg.replace( "\\n", '\n' )
-			self.faqs[key] = msg
+			self.faqs[key.lower()] = msg.lower()
 		self.saveFaqs()
 
 	def ondestroy( self ):
@@ -118,5 +118,6 @@ class Main:
 	  self.admins = parselist(self.app.config["admins"],',')
 	  self.faqfilename = parselist(self.app.config["faqfile"],',')[0]
 	  self.faqlinksfilename = parselist(self.app.config["faqlinksfile"],',')[0]
+	  self.faqbotname = parselist(self.app.config["nick"],',')[0]
 	  self.loadFaqs()
 	  self.loadFaqLinks()
