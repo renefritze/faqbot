@@ -7,7 +7,7 @@ class Main:
 	channels = []
 
 	def onloggedin(self,socket):
-		for chan in self.cmns :
+		for chan in self.channels :
 			socket.send("JOIN %s\n" % (chan))
 		self.joined_channels = 1
 
