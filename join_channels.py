@@ -30,6 +30,7 @@ class Main:
 		for channel in self.channels:
 			savestring += channel + ","
 		self.app.config["channels"] = savestring
+		writeconfigfile("Main.cfg",self.app.config)
 
 	def onload(self,tasc):
 	    self.app = tasc.main
