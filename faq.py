@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from colors import *
-from ParseConfig import *
+from tasbot.ParseConfig import *
 import string
-from utilities import *
+from tasbot.utilities import *
 from time import *
 class Main:
 	chans = []
