@@ -3,16 +3,20 @@ from tasbot.ParseConfig import *
 import string
 from tasbot.utilities import *
 from time import *
-class Main:
-	chans = []
-	admins = []
-	faqs = dict()
-	faqlinks = dict()
-	sortedlinks = {}
-	filename = ""
-	last_faq = ""
-	last_time = time()
-	min_pause = 5.0
+from tasbot.Plugin import IPlugin
+class Main(IPlugin):
+        def __init__(self,name,tasclient):
+                IPlugin.__init__(self,name,tasclient)
+		self.chans = []
+		self.admins = []
+		self.faqs = dict()
+		self.faqlinks = dict()
+		self.sortedlinks = {}
+		self.filename = ""
+		self.last_faq = ""
+		self.last_time = time()
+		self.min_pause = 5.0
+
 	def getFAQ(self,key,socket):
 		return "der"
 

@@ -16,14 +16,14 @@ windows XP: c:\documents and settings\username\app data\.springlobby\springlobby
 
 windows vista and windows 7: c:\users\username\app data\roaming\.springlobby\springlobby.conf|getting_help|http://workaround.org/getting-help-on-irc|paste|If you need to upload some text, such as an infolog.txt, some other file, or any text longer than 3 lines, use a service such as http://pastebin.com/ or http://www.pastey.net/ and post the link to the generated file here.|mod|Spring is just an engine, alone it won't do much, mods are games that run on the engine
 you can download them either from the integrated downloader or from the urls in the #newbies topic
-the most popular mirror url is http://spring.jobjol.nl|ingame|It's "/ingame".|helpcommand|If you want to know about lobby internal commands, use /help
-If you want to know about Frequently Asked Questions, use !faqlist to get a list of topics and !faq topicname to get the help text
-If you want to operate chanserv, check the PM it sent you|ranks|lobby rank is solely based on ingame time accumulated, use /ingame to check your current amount, available ranks are:
+the most popular mirror url is http://spring.jobjol.nl|ingame|It's "/ingame".|startplay|You'll need both a map & a mod(game) to play, both can be downloaded directly by trying to join a game on the list
+A good way to start learning is to spectate ( join a game and select the spectator button) some battle or play a singleplayer game and add a bot
+for more informations, use !faq mod or !faq addbot or !faq download|ranks|lobby rank is solely based on ingame time accumulated, use /ingame to check your current amount, available ranks are:
  newbie: <= 5h, beginner: 5h - 15h, average: 15h - 30h, above average: 30h - 100h, experienced: 100h- 300h
 highly experienced: 300h - 1000h, veteran 1000h - 3000h, need to get laid: > 3000h|no_topic|chanserv handles channel topics, but since its config was lost in server restart it is currently unavailable|broken_datadir|If you get errors such as ''could not parse : 'gamedata/parse_tdf.lua'", it means that either your spring content installation is being broken or cannot be found
 first of all search for all instances of springcontent.sdz in all spring data subfolders BUT skip the folder where spring is installed to ( use !faq datadir for a list of possible folders ) and delete them
-if you're using windows vista/windows7 with the uac on and the problem persists after trying the first step, reinstalling spring to a location other than program files fixes it|startplay|You'll need both a map & a mod(game) to play, both can be downloaded directly by trying to join a game on the list
-A good way to start learning is to spectate ( join a game and select the spectator button) some battle or play a singleplayer game and add a bot
-for more informations, use !faq mod or !faq addbot or !faq download|openal_bug|open /etc/openal/alsoft.conf with a text editor (  needs admin permissions )
+if you're using windows vista/windows7 with the uac on and the problem persists after trying the first step, reinstalling spring to a location other than program files fixes it|helpcommand|If you want to know about lobby internal commands, use /help
+If you want to know about Frequently Asked Questions, use !faqlist to get a list of topics and !faq topicname to get the help text
+If you want to operate chanserv, check the PM it sent you|openal_bug|open /etc/openal/alsoft.conf with a text editor (  needs admin permissions )
 append the following line at the end of the file: drivers = port,pulse,alsa
 restart both lobby and spring|
