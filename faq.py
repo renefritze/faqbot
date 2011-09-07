@@ -54,7 +54,7 @@ class Main(IPlugin):
 				for phrase in self.sortedlinks:
 					if msg.find( phrase ) >= 0:
 						faqkey = self.faqlinks[phrase]
-						print "autodetected message: \"" + msg + "\" faq found: " + faqkey + "\n"
+						Log.notice( "autodetected message: \"%s\" faq found:" %(msg,faqkey))
 						now = time()
 						diff = now - self.last_time
 						if diff > self.min_pause :
@@ -67,7 +67,6 @@ class Main(IPlugin):
 		lines = msg.split('\n')
 		for line in lines :
 			socket.send("SAY %s %s\n" % (channel,line))
-			print ("SAY %s %s\n" % (channel,line))
 
 	def loadFaqs( self ):
 		createFileIfMissing(self.faqfilename)
