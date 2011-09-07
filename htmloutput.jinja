@@ -1,0 +1,20 @@
+<html>
+<body>
+	<table>
+		<thead>
+			<tr>
+				<th>Key</th>
+				<th>Phrase</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for key,phrase in faqs.items()%}
+			<tr>
+				<td>{{key}}</td>
+				<td><p>{{phrase}}</p></td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</body>
+</html>

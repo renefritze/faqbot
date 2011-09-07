@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 from tasbot.ParseConfig import *
 import string
-from tasbot.utilities import *
+from tasbot.utilities import createFileIfMissing
 from time import *
 from tasbot.Plugin import IPlugin
+from jinja2 import Environment, FileSystemLoader
+from tasbot.customlog import Log
+
 class Main(IPlugin):
-        def __init__(self,name,tasclient):
-                IPlugin.__init__(self,name,tasclient)
+	def __init__(self,name,tasclient):
+		IPlugin.__init__(self,name,tasclient)
 		self.chans = []
 		self.admins = []
 		self.faqs = dict()
@@ -21,6 +24,7 @@ class Main(IPlugin):
 		return "der"
 
 	def oncommandfromserver(self,command,args,socket):
+		#these should work in both pm and channel
 		if command.startswith("SAID") and len(args) > 2 and args[1] != self.faqbotname:
 			if args[2] == "!faq" and len(args) > 3:
 				now = time()
@@ -41,6 +45,9 @@ class Main(IPlugin):
 				return
 			elif args[2] == "!faqlink" and args[1] in self.admins and len(args) > 4:
 				self.addFaqLink( args[3], args[4:] )
+				return
+			elif args[2] == "!writehtml" and args[1] in self.admins:
+				self.output_html()
 				return
 			else:
 				msg = " ".join( args[2:] ).lower()
@@ -63,39 +70,37 @@ class Main(IPlugin):
 			print ("SAY %s %s\n" % (channel,line))
 
 	def loadFaqs( self ):
-		faqfile = open(self.faqfilename,'r')
-		content = faqfile.read()
-		entries = content.split('|')
-		i = 0
-		while i < len(entries) - 1  :
-			self.faqs[entries[i].lower()] = entries[i+1]
-			i += 2
-		faqfile.close()
+		createFileIfMissing(self.faqfilename)
+		with open(self.faqfilename,'r') as faqfile:
+			content = faqfile.read()
+			entries = content.split('|')
+			i = 0
+			while i < len(entries) - 1  :
+				self.faqs[entries[i].lower()] = entries[i+1]
+				i += 2
 
 	def loadFaqLinks( self ):
-		faqlinksfile = open(self.faqlinksfilename,'r')
-		content = faqlinksfile.read()
-		entries = content.split('|')
-		i = 0
-		while i < len(entries) - 1  :
-			self.faqlinks[entries[i].lower()] = entries[i+1].lower()
-			i += 2
-		self.sortedlinks = sorted( self.faqlinks, key=len, reverse=True )
-		faqlinksfile.close()
+		createFileIfMissing(self.faqlinksfilename)
+		with open(self.faqlinksfilename,'r') as faqlinksfile:
+			content = faqlinksfile.read()
+			entries = content.split('|')
+			i = 0
+			while i < len(entries) - 1  :
+				self.faqlinks[entries[i].lower()] = entries[i+1].lower()
+				i += 2
+			self.sortedlinks = sorted( self.faqlinks, key=len, reverse=True )
 
 	def saveFaqs( self ):
-		faqfile = open(self.faqfilename,'w')
-		for key,msg in self.faqs.items():
-			faqfile.write( key + "|" + msg + "|" )
-		faqfile.flush()
-		faqfile.close()
+		with open(self.faqfilename,'w') as faqfile:
+			for key,msg in self.faqs.items():
+				faqfile.write( key + "|" + msg + "|" )
+			faqfile.flush()
 
 	def saveFaqLinks( self ):
-		faqlinksfile = open(self.faqlinksfilename,'w')
-		for key,msg in self.faqlinks.items():
-			faqlinksfile.write( key + "|" + msg + "|" )
-		faqlinksfile.flush()
-		faqlinksfile.close()
+		with open(self.faqlinksfilename,'w') as faqlinksfile:
+			for key,msg in self.faqlinks.items():
+				faqlinksfile.write( key + "|" + msg + "|" )
+			faqlinksfile.flush()
 
 	def addFaqLink( self, key, args ):
 		msg = " ".join( args )
@@ -124,3 +129,10 @@ class Main(IPlugin):
 	  self.faqbotname = parselist(self.app.config["nick"],',')[0]
 	  self.loadFaqs()
 	  self.loadFaqLinks()
+
+	def output_html(self):
+		output_fn='test.html'
+		env = Environment(loader=FileSystemLoader('.'))
+		template = env.get_template('htmloutput.jinja')
+		with open(output_fn,'wb') as outfile:
+			outfile.write( template.render(faqs=self.faqs) )
