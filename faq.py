@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
-from tasbot.ParseConfig import *
 import string
-from tasbot.utilities import createFileIfMissing
 from time import *
-from tasbot.Plugin import IPlugin
 from jinja2 import Environment, FileSystemLoader
+
+from tasbot.utilities import createFileIfMissing
+from tasbot.config import Config
+from tasbot.plugin import IPlugin
 from tasbot.customlog import Log
 
+
 class Main(IPlugin):
-	def __init__(self,name,tasclient):
-		IPlugin.__init__(self,name,tasclient)
+	def __init__(self, name, tasclient):
+		IPlugin.__init__(self, name, tasclient)
 		self.chans = []
 		self.admins = []
 		self.faqs = dict()
@@ -20,10 +22,7 @@ class Main(IPlugin):
 		self.last_time = time()
 		self.min_pause = 5.0
 
-	def getFAQ(self,key,socket):
-		return "der"
-
-	def oncommandfromserver(self,command,args,socket):
+	def oncommandfromserver(self, command, args, socket):
 		#these should work in both pm and channel
 		if command.startswith("SAID") and len(args) > 2 and args[1] != self.faqbotname:
 			if args[2] == "!faq" and len(args) > 3:
@@ -31,14 +30,17 @@ class Main(IPlugin):
 				user = args[1]
 				diff = now - self.last_time
 				if diff > self.min_pause :
-					self.printFaq( socket, args[0], args[3] )
+					self.print_faq( socket, args[0], args[3] )
 				self.last_time = time()
 				return
 			elif args[2] == "!faqlearn" and args[1] in self.admins and len(args) > 4:
 				self.addFaq( args[3], args[4:] )
 				return
 			elif args[2] == "!faqlist":
-				faqstring = "available faq items are: "
+				if len(self.faqs) > 0:
+					faqstring = "available faq items are: "
+				else:
+					faqstring = "no faq items avaliable"
 				for key in self.faqs:
 				    faqstring += key + " "
 				socket.send("SAY %s %s\n" % (args[0],faqstring ))
@@ -58,17 +60,17 @@ class Main(IPlugin):
 						now = time()
 						diff = now - self.last_time
 						if diff > self.min_pause :
-							self.printFaq( socket, args[0], faqkey )
+							self.print_faq( socket, args[0], faqkey )
 						self.last_time = time()
 						return
 
-	def printFaq( self, socket, channel, faqname ):
+	def print_faq( self, socket, channel, faqname ):
 		msg = self.faqs[faqname]
 		lines = msg.split('\n')
 		for line in lines :
 			socket.send("SAY %s %s\n" % (channel,line))
 
-	def loadFaqs( self ):
+	def _load_faqs( self ):
 		createFileIfMissing(self.faqfilename)
 		with open(self.faqfilename,'r') as faqfile:
 			content = faqfile.read()
@@ -78,7 +80,7 @@ class Main(IPlugin):
 				self.faqs[entries[i].lower()] = entries[i+1]
 				i += 2
 
-	def loadFaqLinks( self ):
+	def _load_faqlinks( self ):
 		createFileIfMissing(self.faqlinksfilename)
 		with open(self.faqlinksfilename,'r') as faqlinksfile:
 			content = faqlinksfile.read()
@@ -89,13 +91,13 @@ class Main(IPlugin):
 				i += 2
 			self.sortedlinks = sorted( self.faqlinks, key=len, reverse=True )
 
-	def saveFaqs( self ):
+	def _save_faqs( self ):
 		with open(self.faqfilename,'w') as faqfile:
 			for key,msg in self.faqs.items():
 				faqfile.write( key + "|" + msg + "|" )
 			faqfile.flush()
 
-	def saveFaqLinks( self ):
+	def _saveFaqLinks( self ):
 		with open(self.faqlinksfilename,'w') as faqlinksfile:
 			for key,msg in self.faqlinks.items():
 				faqlinksfile.write( key + "|" + msg + "|" )
@@ -113,21 +115,21 @@ class Main(IPlugin):
 		if msg != "" :
 			msg = msg.replace( "\\n", '\n' )
 			self.faqs[key.lower()] = msg.lower()
-		self.saveFaqs()
+		self.save_faqs()
 
 	def ondestroy( self ):
-		self.saveFaqs()
-		self.saveFaqLinks()
+		self._save_faqs()
+		self._saveFaqLinks()
 
 	def onload(self,tasc):
 	  self.app = tasc.main
-	  self.chans = parselist(self.app.config["channels"],',')
-	  self.admins = parselist(self.app.config["admins"],',')
-	  self.faqfilename = parselist(self.app.config["faqfile"],',')[0]
-	  self.faqlinksfilename = parselist(self.app.config["faqlinksfile"],',')[0]
-	  self.faqbotname = parselist(self.app.config["nick"],',')[0]
-	  self.loadFaqs()
-	  self.loadFaqLinks()
+	  self.chans = self.app.config.GetOptionList('join_channels',"channels")
+	  self.admins = self.app.config.GetOptionList('tasbot',"admins")
+	  self.faqfilename = self.app.config.get('faq',"faqfile")
+	  self.faqlinksfilename = self.app.config.get('faq',"faqlinksfile")
+	  self.faqbotname = self.app.config.get('tasbot',"nick")
+	  self._load_faqs()
+	  self._load_faqlinks()
 
 	def output_html(self):
 		output_fn='test.html'

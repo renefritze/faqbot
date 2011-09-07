@@ -1,1 +1,0 @@
-/home/springbot/tasbot/tasbot/plugins/join_channels.py
