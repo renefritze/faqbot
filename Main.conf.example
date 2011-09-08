@@ -1,13 +1,18 @@
-%serveraddr=localhost;
-serveraddr=taspringmaster.clan-sy.com;
-serverport=8200;
+[tasbot]
+serverport=8200
+serveraddr=taspringmaster.clan-sy.com
+nick=FaqBot
+password=
+debug=1
+logfile=faqbot.log
+pidfile=faqbot.pid
 
-nick=FaqBot;
-password=;
+admins=_koshi_,BrainDamage
+plugins=faq,join_channels
 
-admins=_koshi_,BrainDamage,koshi007,WindyPeet;
-plugins=help,faq,join_channels;
+[join_channels]
+channels=sasi
 
-channels=springlobby;
-faqfile=faqs.txt;
-faqlinksfile=faqlinks.txt;
+[faq]
+faqlinksfile=faqlinks.txt
+faqfile=faqs.txt
