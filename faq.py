@@ -21,10 +21,11 @@ class Main(IPlugin):
 		self.last_faq = ""
 		self.last_time = time()
 		self.min_pause = 5.0
-		self.commands = { 'SAID': [ Command('faq', 4), Command('faqlearn', 4), Command('faqlist', 2) ], }
+		self.logger.debug(self.commands)
 
+	@IPlugin._num_args(4)
 	@IPlugin._not_self
-	def faq(self, args, socket):
+	def cmd_said_faq(self, args, socket):
 		now = time()
 		user = args[1]
 		diff = now - self.last_time
@@ -32,8 +33,9 @@ class Main(IPlugin):
 			self.print_faq( socket, args[0], args[3] )
 		self.last_time = time()
 
+	@IPlugin._num_args()
 	@IPlugin._not_self
-	def faqlist(self,args, socket):
+	def cmd_said_faqlist(self,args, socket):
 		if len(self.faqs) > 0:
 			faqstring = "available faq items are: "
 		else:
@@ -41,9 +43,10 @@ class Main(IPlugin):
 		for key in self.faqs:
 			faqstring += key + " "
 		socket.send("SAY %s %s\n" % (args[0],faqstring ))
-		
+	
+	@IPlugin._num_args(4)
 	@IPlugin._admin_only
-	def faqlearn(self,args, socket):
+	def cmd_said_faqlearn(self,args, socket):
 		def addFaq( key, args ):
 			msg = " ".join( args )
 			if msg != "" :
@@ -56,12 +59,10 @@ class Main(IPlugin):
 	def oncommandfromserver(self, command, args, socket):
 		if len(args) <= 2:
 			return
-		try:
-			cmd_name = args[2]
-			for c in self.commands[command]:
-				if (len(args) >= c.min_no_args and '!%s'%c.trigger == cmd_name and
-						c.access(args)):
-					func = getattr(self, c.trigger)
+		try:				
+			for trigger,funcname in self.commands[command]:
+				if trigger == args[2]:
+					func = getattr(self, funcname)
 					func(args, socket)
 		except KeyError:
 			pass
