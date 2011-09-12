@@ -5,7 +5,7 @@ from jinja2 import Environment, FileSystemLoader
 
 from tasbot.utilities import createFileIfMissing
 from tasbot.config import Config
-from tasbot.plugin import IPlugin
+from tasbot.plugin import IPlugin, Command
 from tasbot.customlog import Log
 
 
@@ -21,31 +21,55 @@ class Main(IPlugin):
 		self.last_faq = ""
 		self.last_time = time()
 		self.min_pause = 5.0
+		self.commands = { 'SAID': [ Command('faq', 4), Command('faqlearn', 4), Command('faqlist', 2) ], }
+
+	@IPlugin._not_self
+	def faq(self, args, socket):
+		now = time()
+		user = args[1]
+		diff = now - self.last_time
+		if diff > self.min_pause :
+			self.print_faq( socket, args[0], args[3] )
+		self.last_time = time()
+
+	@IPlugin._not_self
+	def faqlist(self,args, socket):
+		if len(self.faqs) > 0:
+			faqstring = "available faq items are: "
+		else:
+			faqstring = "no faq items avaliable"
+		for key in self.faqs:
+			faqstring += key + " "
+		socket.send("SAY %s %s\n" % (args[0],faqstring ))
+		
+	@IPlugin._admin_only
+	def faqlearn(self,args, socket):
+		def addFaq( key, args ):
+			msg = " ".join( args )
+			if msg != "" :
+				msg = msg.replace( "\\n", '\n' )
+				self.faqs[key.lower()] = msg.lower()
+			self._save_faqs()
+		addFaq( args[3], args[4:] )
+		self.tasclient.saypm( args[1], 'saved')
 
 	def oncommandfromserver(self, command, args, socket):
+		if len(args) <= 2:
+			return
+		try:
+			cmd_name = args[2]
+			for c in self.commands[command]:
+				if (len(args) >= c.min_no_args and '!%s'%c.trigger == cmd_name and
+						c.access(args)):
+					func = getattr(self, c.trigger)
+					func(args, socket)
+		except KeyError:
+			pass
+		except Exception,e:
+			self.logger.exception(e)
 		#these should work in both pm and channel
 		if command.startswith("SAID") and len(args) > 2 and args[1] != self.faqbotname:
-			if args[2] == "!faq" and len(args) > 3:
-				now = time()
-				user = args[1]
-				diff = now - self.last_time
-				if diff > self.min_pause :
-					self.print_faq( socket, args[0], args[3] )
-				self.last_time = time()
-				return
-			elif args[2] == "!faqlearn" and args[1] in self.admins and len(args) > 4:
-				self.addFaq( args[3], args[4:] )
-				return
-			elif args[2] == "!faqlist":
-				if len(self.faqs) > 0:
-					faqstring = "available faq items are: "
-				else:
-					faqstring = "no faq items avaliable"
-				for key in self.faqs:
-				    faqstring += key + " "
-				socket.send("SAY %s %s\n" % (args[0],faqstring ))
-				return
-			elif args[2] == "!faqlink" and args[1] in self.admins and len(args) > 4:
+			if args[2] == "!faqlink" and args[1] in self.admins and len(args) > 4:
 				self.addFaqLink( args[3], args[4:] )
 				return
 			elif args[2] == "!writehtml" and args[1] in self.admins:
@@ -109,13 +133,6 @@ class Main(IPlugin):
 			self.faqlinks[msg.lower()] = key.lower()
 			self.sortedlinks = sorted( self.faqlinks, key=len, reverse=True )
 		self.saveFaqLinks()
-
-	def addFaq( self, key, args ):
-		msg = " ".join( args )
-		if msg != "" :
-			msg = msg.replace( "\\n", '\n' )
-			self.faqs[key.lower()] = msg.lower()
-		self.save_faqs()
 
 	def ondestroy( self ):
 		self._save_faqs()
