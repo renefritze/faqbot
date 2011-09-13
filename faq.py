@@ -5,7 +5,7 @@ from jinja2 import Environment, FileSystemLoader
 
 from tasbot.utilities import createFileIfMissing
 from tasbot.config import Config
-from tasbot.plugin import IPlugin, Command
+from tasbot.plugin import IPlugin, CHAT_COMMANDS, ALL_COMMANDS
 from tasbot.customlog import Log
 
 
@@ -25,7 +25,7 @@ class Main(IPlugin):
 
 	@IPlugin._num_args(4)
 	@IPlugin._not_self
-	def cmd_said_faq(self, args, socket):
+	def cmd_said_faq(self, args, tas_command):
 		now = time()
 		user = args[1]
 		diff = now - self.last_time
@@ -33,20 +33,24 @@ class Main(IPlugin):
 			self.print_faq( socket, args[0], args[3] )
 		self.last_time = time()
 
-	@IPlugin._num_args()
+	@IPlugin._num_args(2)
 	@IPlugin._not_self
-	def cmd_said_faqlist(self,args, socket):
+	def cmd_said_faqlist(self,args, tas_command):
 		if len(self.faqs) > 0:
 			faqstring = "available faq items are: "
 		else:
 			faqstring = "no faq items avaliable"
 		for key in self.faqs:
 			faqstring += key + " "
-		socket.send("SAY %s %s\n" % (args[0],faqstring ))
+		verb = tas_command.replace('SAID', 'SAY')
+		self.tasclient.send_raw("%s %s %s\n" % (verb, args[0], faqstring))
+		self.logger.debug("%s %s %s\n" % (verb, args[0], faqstring))
+	
+	cmd_saidprivate_faqlist = cmd_said_faqlist
 	
 	@IPlugin._num_args(4)
 	@IPlugin._admin_only
-	def cmd_said_faqlearn(self,args, socket):
+	def cmd_said_faqlearn(self,args, tas_command):
 		def addFaq( key, args ):
 			msg = " ".join( args )
 			if msg != "" :
@@ -56,38 +60,47 @@ class Main(IPlugin):
 		addFaq( args[3], args[4:] )
 		self.tasclient.saypm( args[1], 'saved')
 
+	@IPlugin._num_args(5)
+	@IPlugin._admin_only
+	def cmd_said_faqlink(self, args, tas_command):
+		self.addFaqLink( args[3], args[4:] )
+		
+	@IPlugin._num_args()
+	@IPlugin._admin_only
+	def cmd_said_writehtml(self, args, tas_command):
+		self.output_html()
+		
+	def cmd_battlDDeopened(self, args, tas_command):
+		pass
+	def cmd_fuckshit(self, args, tas_command):
+		pass
+			
 	def oncommandfromserver(self, command, args, socket):
-		if len(args) <= 2:
-			return
-		try:				
+		try:
 			for trigger,funcname in self.commands[command]:
-				if trigger == args[2]:
+				self.logger.debug('TRIGGERED %s %s'%(command, ' '.join(args)))
+				if ((command in CHAT_COMMANDS and command.find('PRIVATE') == -1 and trigger == args[2]) or
+						(command in CHAT_COMMANDS and trigger == args[1]) or
+						(command in set(ALL_COMMANDS).difference(CHAT_COMMANDS) and trigger == None)):
 					func = getattr(self, funcname)
-					func(args, socket)
-		except KeyError:
-			pass
-		except Exception,e:
+					func(args, command)
+		except KeyError, k:
+			self.logger.exception(k)
+		except Exception, e:
 			self.logger.exception(e)
 		#these should work in both pm and channel
 		if command.startswith("SAID") and len(args) > 2 and args[1] != self.faqbotname:
-			if args[2] == "!faqlink" and args[1] in self.admins and len(args) > 4:
-				self.addFaqLink( args[3], args[4:] )
-				return
-			elif args[2] == "!writehtml" and args[1] in self.admins:
-				self.output_html()
-				return
-			else:
-				msg = " ".join( args[2:] ).lower()
-				for phrase in self.sortedlinks:
-					if msg.find( phrase ) >= 0:
-						faqkey = self.faqlinks[phrase]
-						Log.notice( "autodetected message: \"%s\" faq found:" %(msg,faqkey))
-						now = time()
-						diff = now - self.last_time
-						if diff > self.min_pause :
-							self.print_faq( socket, args[0], faqkey )
-						self.last_time = time()
-						return
+			msg = " ".join( args[2:] ).lower()
+			for phrase in self.sortedlinks:
+				if msg.find( phrase ) >= 0:
+					faqkey = self.faqlinks[phrase]
+					Log.notice( "autodetected message: \"%s\" faq found:" %(msg,faqkey))
+					now = time()
+					diff = now - self.last_time
+					if diff > self.min_pause :
+						self.print_faq( socket, args[0], faqkey )
+					self.last_time = time()
+					return
 
 	def print_faq( self, socket, channel, faqname ):
 		msg = self.faqs[faqname]
