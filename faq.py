@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-import string
 from time import *
 from jinja2 import Environment, FileSystemLoader
 
 from tasbot.utilities import createFileIfMissing
-from tasbot.config import Config
-from tasbot.plugin import IPlugin, CHAT_COMMANDS, ALL_COMMANDS
-from tasbot.customlog import Log
+from tasbot.plugin import IPlugin
+from tasbot.decorators import AdminOnly, NotSelf, MinArgs
 
 
 class Main(IPlugin):
@@ -22,20 +20,21 @@ class Main(IPlugin):
 		self.last_time = time()
 		self.min_pause = 5.0
 
-	@IPlugin._not_self
-	@IPlugin._num_args(4)
+	@AdminOnly
+	@NotSelf
+	@MinArgs(4)
 	def cmd_said_faq(self, args, tas_command):
 		"""dummy"""
 		now = time()
-		user = args[1]
 		diff = now - self.last_time
-		if diff > self.min_pause :
-			self.print_faq( socket, args[0], args[3] )
+		if diff > self.min_pause:
+			self.print_faq(args[0], args[3], tas_command)
 		self.last_time = time()
 
-	@IPlugin._not_self
-	@IPlugin._num_args(2)
-	def cmd_said_faqlist(self,args, tas_command):
+	@AdminOnly
+	@NotSelf
+	def cmd_said_faqlist(self, args, tas_command):
+		"""Stuff about faqlist"""
 		if len(self.faqs) > 0:
 			faqstring = "available faq items are: "
 		else:
@@ -43,14 +42,14 @@ class Main(IPlugin):
 		for key in self.faqs:
 			faqstring += key + " "
 		self.tasclient.say_pm_or_channel( tas_command, args[0], faqstring)
-	
+
 	cmd_saidprivate_faqlist = cmd_said_faqlist
-	
-	@IPlugin._admin_only
-	@IPlugin._num_args(4)
-	def cmd_said_faqlearn(self,args, tas_command):
+
+	@AdminOnly
+	@MinArgs(4)
+	def cmd_said_faqlearn(self, args, tas_command):
 		def addFaq( key, args ):
-			msg = " ".join( args )
+			msg = " ".join(args)
 			if msg != "" :
 				msg = msg.replace( "\\n", '\n' )
 				self.faqs[key.lower()] = msg.lower()
@@ -58,17 +57,17 @@ class Main(IPlugin):
 		addFaq( args[3], args[4:] )
 		self.tasclient.saypm( args[1], 'saved')
 
-	@IPlugin._admin_only
-	@IPlugin._num_args(5)
+	@AdminOnly
+	@MinArgs(5)
 	def cmd_said_faqlink(self, args, tas_command):
 		self.addFaqLink( args[3], args[4:] )
-		
-	@IPlugin._admin_only
-	@IPlugin._num_args()
+
+	@AdminOnly
+	@MinArgs()
 	def cmd_said_writehtml(self, args, tas_command):
 		self.output_html()
 
-	@IPlugin._not_self
+	@NotSelf
 	def cmd_said(self, args, tas_command):
 		msg = " ".join(args[2:]).lower()
 		for phrase in self.sortedlinks:
@@ -85,11 +84,11 @@ class Main(IPlugin):
 	#def oncommandfromserver(self, command, args, socket):
 		#pass
 
-	def print_faq( self, socket, channel, faqname ):
+	def print_faq( self, channel, faqname, tas_command ):
 		msg = self.faqs[faqname]
 		lines = msg.split('\n')
 		for line in lines :
-			socket.send("SAY %s %s\n" % (channel,line))
+			self.tasclient.say_pm_or_channel(tas_command, channel, line)
 
 	def _load_faqs( self ):
 		createFileIfMissing(self.faqfilename)
