@@ -9,7 +9,7 @@ from tasbot.decorators import AdminOnly, NotSelf, MinArgs
 
 class Main(IPlugin):
 	def __init__(self, name, tasclient):
-		IPlugin.__init__(self, name, tasclient)
+		super(Main,self).__init__(name, tasclient)
 		self.chans = []
 		self.admins = []
 		self.faqs = dict()
@@ -81,9 +81,6 @@ class Main(IPlugin):
 				self.last_time = time()
 				return
 
-	#def oncommandfromserver(self, command, args, socket):
-		#pass
-
 	def print_faq( self, channel, faqname, tas_command ):
 		msg = self.faqs[faqname]
 		lines = msg.split('\n')
@@ -136,8 +133,8 @@ class Main(IPlugin):
 
 	def onload(self,tasc):
 	  self.app = tasc.main
-	  self.chans = self.app.config.GetOptionList('join_channels',"channels")
-	  self.admins = self.app.config.GetOptionList('tasbot',"admins")
+	  self.chans = self.app.config.get_optionlist('join_channels',"channels")
+	  self.admins = self.app.config.get_optionlist('tasbot',"admins")
 	  self.faqfilename = self.app.config.get('faq',"faqfile")
 	  self.faqlinksfilename = self.app.config.get('faq',"faqlinksfile")
 	  self.faqbotname = self.app.config.get('tasbot',"nick")
